@@ -3,7 +3,7 @@ import { Section } from './Section/Section';
 import { ContactsForm } from './ContactForm/ContactsForm';
 import { ContactsList } from './ContactList/ContactsList';
 import { nanoid } from 'nanoid';
-import { SearchField } from './SearchFile/SearchField';
+import { SearchFile } from './SearchFile/SearchFile';
 
 export class App extends Component {
   state = {
@@ -32,6 +32,18 @@ export class App extends Component {
     }
   };
 
+  handleFilterInput = evt => {
+    this.setState({ filter: evt.target.value });
+  };
+
+  getFindContact = () => {
+    const { filter, contacts } = this.state;
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().startsWith(normalizedFilter)
+    );
+  };
+
   handleDeleteContact = contactId => {
     this.setState(prevState => ({
       contacts: prevState.contacts.filter(contact => contact.id !== contactId),
@@ -39,15 +51,19 @@ export class App extends Component {
   };
 
   render() {
+    const findContacts = this.getFindContact();
     return (
       <div>
         <Section title="Phonebook">
           <ContactsForm handleAddName={this.handleAddName} />
         </Section>
         <Section title="Contacts">
-          <SearchField />
+          <SearchFile
+            onChange={this.handleFilterInput}
+            filter={this.state.filter}
+          />
           <ContactsList
-            contacts={this.state.contacts}
+            contacts={findContacts}
             onDeleteContact={this.handleDeleteContact}
           />
         </Section>
